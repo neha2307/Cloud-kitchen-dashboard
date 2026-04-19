@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply bg-cream-50 text-ink-800 font-sans antialiased;
+}
+
+.dark body {
+  @apply bg-ink-900 text-ink-100;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  @apply bg-ink-200 dark:bg-ink-700 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-ink-300 dark:bg-ink-600;
+}
+
+/* Tiny util */
+.card {
+  @apply bg-white dark:bg-ink-800 border border-ink-100 dark:border-ink-700 rounded-2xl shadow-soft;
+}
+
+.input {
+  @apply w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-ink-800
+         border border-ink-200 dark:border-ink-700
+         text-ink-800 dark:text-ink-100 placeholder-ink-300 dark:placeholder-ink-500
+         focus:outline-none focus:ring-2 focus:ring-saffron-500/30 focus:border-saffron-500 transition;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium
+         transition-all select-none whitespace-nowrap;
+}
+.btn-primary {
+  @apply btn bg-saffron-500 text-white hover:bg-saffron-600 shadow-soft;
+}
+.btn-secondary {
+  @apply btn bg-white dark:bg-ink-800 text-ink-700 dark:text-ink-100
+         border border-ink-200 dark:border-ink-700 hover:bg-cream-50 dark:hover:bg-ink-700;
+}
+.btn-ghost {
+  @apply btn text-ink-600 dark:text-ink-200 hover:bg-ink-100 dark:hover:bg-ink-700;
+}
+
+.chip {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+}
+
+.gradient-brand {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(232,93,40,0.18), transparent 60%),
+              radial-gradient(800px 400px at 100% 110%, rgba(232,93,40,0.10), transparent 60%),
+              linear-gradient(180deg, #FBF9F6 0%, #F5F1EA 100%);
+}
+
+.dark .gradient-brand {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(232,93,40,0.22), transparent 60%),
+              radial-gradient(800px 400px at 100% 110%, rgba(232,93,40,0.10), transparent 60%),
+              linear-gradient(180deg, #12100B 0%, #1C1812 100%);
+}
+
+/* Kanban column scroll */
+.kanban-scroll { scrollbar-width: thin; }
