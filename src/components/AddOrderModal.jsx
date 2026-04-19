@@ -149,6 +149,11 @@ export default function AddOrderModal() {
   }
 
   // --- validation ---
+  // Order matters — first key drives the scroll-to-first-error + toast copy.
+  const ERROR_LABEL = {
+    phone: 'Phone number', customer: 'Customer name', items: 'At least one item',
+    address: 'Delivery address', scheduledTime: 'Scheduled time',
+  }
   function validate() {
     const e = {}
     const phoneDigits = form.phone.replace(/\D/g, '')
@@ -163,12 +168,32 @@ export default function AddOrderModal() {
       e.scheduledTime = 'Pick a time'
     }
     setErrors(e)
-    return Object.keys(e).length === 0
+    return e
   }
 
   async function handleSubmit(evt) {
     evt?.preventDefault()
-    if (!validate()) return
+    const e = validate()
+    if (Object.keys(e).length > 0) {
+      // Surface the failure: toast + scroll the first invalid field into view
+      const firstKey = Object.keys(e)[0]
+      const missing = Object.keys(e).map(k => ERROR_LABEL[k] || k).join(', ')
+      showToast({
+        title: 'Please complete the order',
+        description: `Missing or invalid: ${missing}`,
+        tone: 'error',
+      })
+      // defer so the error border renders before we scroll
+      requestAnimationFrame(() => {
+        const el = document.querySelector(`[data-field="${firstKey}"]`)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          const focusable = el.querySelector('input, textarea, button')
+          focusable?.focus?.()
+        }
+      })
+      return
+    }
     setSubmitting(true)
 
     // Small delay so the "Creating..." state reads; also prevents double-tap
@@ -283,7 +308,7 @@ export default function AddOrderModal() {
           {/* Customer */}
           <Section label="Customer" icon={User}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
+              <div data-field="phone">
                 <Label>Phone number *</Label>
                 <input
                   type="tel" inputMode="numeric" autoFocus
@@ -305,7 +330,7 @@ export default function AddOrderModal() {
                   </div>
                 )}
               </div>
-              <div>
+              <div data-field="customer">
                 <Label>Customer name *</Label>
                 <input
                   value={form.customer}
@@ -343,6 +368,7 @@ export default function AddOrderModal() {
 
           {/* Items */}
           <Section label="Items *" icon={UtensilsCrossed}>
+            <div data-field="items" />
             {/* Search */}
             <div className="flex items-center gap-2 bg-cream-50 dark:bg-ink-800 border border-ink-200 dark:border-ink-700 rounded-xl px-3 py-2">
               <Search className="h-4 w-4 text-ink-400" />
@@ -470,7 +496,7 @@ export default function AddOrderModal() {
 
             {form.deliveryType === 'delivery' && (
               <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="md:col-span-2">
+                <div className="md:col-span-2" data-field="address">
                   <Label>Delivery address *</Label>
                   <textarea
                     rows={2}
@@ -494,7 +520,7 @@ export default function AddOrderModal() {
               </div>
             )}
 
-            <div className="mt-4">
+            <div className="mt-4" data-field="scheduledTime">
               <Label>When</Label>
               <div className="flex flex-wrap gap-2 items-center">
                 <PillToggle
