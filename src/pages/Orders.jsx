@@ -3,30 +3,24 @@ import { Plus, Filter, Search, LayoutGrid, List as ListIcon } from 'lucide-react
 import Topbar from '../components/Topbar.jsx'
 import OrderCard from '../components/OrderCard.jsx'
 import Badge from '../components/Badge.jsx'
-import { ORDER_STATUSES, ORDERS } from '../data/orders.js'
+import { ORDER_STATUSES } from '../data/orders.js'
+import { useOrders } from '../context/OrdersContext.jsx'
+import { useUI } from '../context/UIContext.jsx'
 
-const NEXT_STATUS = {
-  new:       { next: 'accepted',  label: 'Accept' },
-  accepted:  { next: 'preparing', label: 'Start prep' },
-  preparing: { next: 'ready',     label: 'Mark ready' },
-  ready:     { next: 'out',       label: 'Dispatch' },
-  out:       { next: 'delivered', label: 'Delivered' },
-  delivered: null,
-  cancelled: null,
+const NEXT_LABELS = {
+  new:       'Accept',
+  accepted:  'Start prep',
+  preparing: 'Mark ready',
+  ready:     'Dispatch',
+  out:       'Delivered',
 }
 
 export default function Orders() {
-  const [orders, setOrders] = useState(ORDERS)
+  const { orders, advanceOrder } = useOrders()
+  const { openNewOrder } = useUI()
   const [query, setQuery] = useState('')
   const [view, setView] = useState('board') // board | list
   const [sourceFilter, setSourceFilter] = useState('all')
-
-  const advance = (id) => {
-    setOrders(prev => prev.map(o => {
-      const n = NEXT_STATUS[o.status]
-      return o.id === id && n ? { ...o, status: n.next } : o
-    }))
-  }
 
   const filtered = useMemo(() => {
     return orders.filter(o =>
@@ -79,7 +73,7 @@ export default function Orders() {
             <button onClick={() => setView('list')} className={`p-1.5 rounded-lg ${view==='list'?'bg-ink-100 dark:bg-ink-700':''}`}><ListIcon className="h-4 w-4" /></button>
           </div>
           <button className="btn-secondary !py-2"><Filter className="h-4 w-4" />Filter</button>
-          <button className="btn-primary !py-2"><Plus className="h-4 w-4" />New order</button>
+          <button onClick={openNewOrder} className="btn-primary !py-2"><Plus className="h-4 w-4" />New order</button>
         </div>
 
         {view === 'board' ? (
@@ -100,13 +94,13 @@ export default function Orders() {
                       <div className="text-xs text-ink-300 dark:text-ink-500 text-center py-6">Nothing here</div>
                     )}
                     {list.map(o => {
-                      const next = NEXT_STATUS[o.status]
+                      const nextLabel = NEXT_LABELS[o.status]
                       return (
                         <OrderCard
                           key={o.id}
                           order={o}
-                          onAdvance={next ? advance : null}
-                          nextLabel={next?.label}
+                          onAdvance={nextLabel ? advanceOrder : null}
+                          nextLabel={nextLabel}
                         />
                       )
                     })}
@@ -149,6 +143,15 @@ export default function Orders() {
           </div>
         )}
       </div>
+
+      {/* Mobile FAB for adding orders */}
+      <button
+        onClick={openNewOrder}
+        className="fab md:hidden"
+        aria-label="New order"
+      >
+        <Plus className="h-6 w-6" />
+      </button>
     </>
   )
 }

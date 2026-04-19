@@ -77,3 +77,37 @@ body {
 
 /* Kanban column scroll */
 .kanban-scroll { scrollbar-width: thin; }
+
+/* Modal + toast animations */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes sheetIn {
+  from { opacity: 0; transform: translateY(16px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes sheetInMobile {
+  from { opacity: 0; transform: translateY(100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-backdrop { animation: backdropIn .18s ease-out; }
+.animate-sheet    { animation: sheetIn .26s cubic-bezier(.2,.9,.25,1); }
+@media (max-width: 639px) {
+  .animate-sheet  { animation: sheetInMobile .3s cubic-bezier(.2,.9,.25,1); }
+}
+
+/* FAB */
+.fab {
+  @apply fixed z-40 h-14 w-14 rounded-full bg-saffron-500 text-white shadow-pop
+         grid place-items-center hover:bg-saffron-600 active:scale-95 transition-all;
+  bottom: calc(env(safe-area-inset-bottom, 0) + 5.25rem);
+  right: 1rem;
+}
+@media (min-width: 768px) {
+  .fab { bottom: 2rem; right: 2rem; }
+}

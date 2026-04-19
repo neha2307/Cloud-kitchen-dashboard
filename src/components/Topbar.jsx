@@ -1,10 +1,12 @@
 import { Bell, Search, Moon, Sun, Plus, HelpCircle } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useUI } from '../context/UIContext.jsx'
 
 export default function Topbar({ title, subtitle, action }) {
   const { theme, toggle } = useTheme()
   const { user } = useAuth()
+  const { openNewOrder } = useUI()
 
   return (
     <header className="sticky top-0 z-30 bg-cream-50/80 dark:bg-ink-900/80 backdrop-blur border-b border-ink-100 dark:border-ink-700">
@@ -39,7 +41,7 @@ export default function Topbar({ title, subtitle, action }) {
         </button>
 
         {action || (
-          <button className="btn-primary hidden md:inline-flex">
+          <button onClick={openNewOrder} className="btn-primary hidden md:inline-flex">
             <Plus className="h-4 w-4" /> New order
           </button>
         )}

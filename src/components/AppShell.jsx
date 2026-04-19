@@ -1,6 +1,8 @@
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar.jsx'
 import BottomNav from './BottomNav.jsx'
+import AddOrderModal from './AddOrderModal.jsx'
+import ToastContainer from './Toast.jsx'
 
 export default function AppShell() {
   return (
@@ -10,6 +12,8 @@ export default function AppShell() {
         <Outlet />
       </main>
       <BottomNav />
+      <AddOrderModal />
+      <ToastContainer />
     </div>
   )
 }

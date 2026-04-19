@@ -9,9 +9,10 @@ import Topbar from '../components/Topbar.jsx'
 import StatCard from '../components/StatCard.jsx'
 import Badge from '../components/Badge.jsx'
 import OrderCard from '../components/OrderCard.jsx'
-import { ORDERS, ORDER_STATUSES } from '../data/orders.js'
+import { ORDER_STATUSES } from '../data/orders.js'
 import { TOP_DISHES, SOURCE_MIX, ALERTS, DAILY_ORDERS_TREND } from '../data/analytics.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useOrders } from '../context/OrdersContext.jsx'
 
 const alertStyle = {
   urgent: 'bg-rose-500/10 text-rose-700 dark:text-rose-300',
@@ -22,13 +23,14 @@ const alertIcon = { urgent: Siren, warn: AlertTriangle, info: Info }
 
 export default function Dashboard() {
   const { user } = useAuth()
+  const { orders } = useOrders()
   const hour = new Date().getHours()
   const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
 
-  const liveOrders = ORDERS.filter(o => !['delivered', 'cancelled'].includes(o.status))
-  const deliveredToday = ORDERS.filter(o => o.status === 'delivered')
-  const revenueToday = ORDERS.filter(o => o.status !== 'cancelled').reduce((s, o) => s + o.total, 0)
-  const avgTicket = Math.round(revenueToday / Math.max(1, ORDERS.length - 1))
+  const liveOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.status))
+  const deliveredToday = orders.filter(o => o.status === 'delivered')
+  const revenueToday = orders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + o.total, 0)
+  const avgTicket = Math.round(revenueToday / Math.max(1, orders.length - 1))
 
   return (
     <>
@@ -40,7 +42,7 @@ export default function Dashboard() {
       <div className="p-4 md:p-8 space-y-6">
         {/* KPI row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Orders today"     value={ORDERS.length}                delta="+18%" trend="up"   icon={ShoppingBag}  accent="saffron" />
+          <StatCard label="Orders today"     value={orders.length}                delta="+18%" trend="up"   icon={ShoppingBag}  accent="saffron" />
           <StatCard label="Revenue today"    value={`₹${revenueToday.toLocaleString('en-IN')}`} delta="+12%" trend="up"   icon={IndianRupee} accent="emerald" />
           <StatCard label="Avg. ticket size" value={`₹${avgTicket}`}              delta="+4%"  trend="up"   icon={TrendingUp}   accent="indigo" />
           <StatCard label="Avg. prep time"   value="22 min"                       delta="-3 min" trend="up" icon={Clock}        accent="rose" />
