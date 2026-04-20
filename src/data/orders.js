@@ -16,79 +16,109 @@ export const SOURCE_META = {
   repeat:    { label: 'Repeat',    color: 'text-saffron-700 bg-saffron-50 dark:bg-saffron-500/10 dark:text-saffron-300' },
 }
 
+// Filter meta — used by FilterPanel / FilterChips on the Orders page.
+export const PAYMENT_STATUSES = [
+  { key: 'paid',    label: 'Paid',    tone: 'emerald' },
+  { key: 'pending', label: 'Pending', tone: 'amber'   },
+]
+
+export const DELIVERY_TYPES = [
+  { key: 'delivery', label: 'Delivery' },
+  { key: 'pickup',   label: 'Pickup'   },
+]
+
+// Presets for the Date filter — compared against `placedAtDaysAgo`.
+export const DATE_RANGES = [
+  { key: 'today',  label: 'Today',         maxDays: 0 },
+  { key: 'last3',  label: 'Last 3 days',   maxDays: 2 },
+  { key: 'week',   label: 'This week',     maxDays: 6 },
+]
+
 let _id = 1000
 const mkId = () => `ORD-${++_id}`
 
 export const ORDERS = [
   {
     id: mkId(), customer: 'Ananya Sharma', phone: '+91 98765 43210', area: 'Indiranagar',
-    source: 'whatsapp', status: 'new', placedAt: '12:42 PM', eta: '20 min',
+    source: 'whatsapp', status: 'new', placedAt: '12:42 PM', placedAtDaysAgo: 0, eta: '20 min',
+    deliveryType: 'delivery', payment: { status: 'paid', method: 'UPI' },
     items: [{ name: 'Butter Chicken', qty: 1, price: 340 }, { name: 'Garlic Naan', qty: 2, price: 60 }],
     total: 460, notes: 'Less spicy please'
   },
   {
     id: mkId(), customer: 'Rohan Verma', phone: '+91 99876 12345', area: 'Koramangala 5th Block',
-    source: 'instagram', status: 'new', placedAt: '12:48 PM', eta: '25 min',
+    source: 'instagram', status: 'new', placedAt: '12:48 PM', placedAtDaysAgo: 0, eta: '25 min',
+    deliveryType: 'delivery', payment: { status: 'pending', method: 'Cash' },
     items: [{ name: 'Paneer Tikka Masala', qty: 1, price: 310 }, { name: 'Jeera Rice', qty: 1, price: 180 }],
     total: 490, notes: 'Jain — no onion/garlic'
   },
   {
     id: mkId(), customer: 'Kavya Iyer', phone: '+91 90011 22334', area: 'HSR Layout Sector 2',
-    source: 'repeat', status: 'accepted', placedAt: '12:30 PM', eta: '15 min',
+    source: 'repeat', status: 'accepted', placedAt: '12:30 PM', placedAtDaysAgo: 0, eta: '15 min',
+    deliveryType: 'delivery', payment: { status: 'paid', method: 'UPI' },
     items: [{ name: 'Chicken Biryani', qty: 2, price: 320 }, { name: 'Raita', qty: 2, price: 50 }],
     total: 740, notes: '4th order this month'
   },
   {
     id: mkId(), customer: 'Vikram Rao', phone: '+91 93332 44556', area: 'Whitefield',
-    source: 'website', status: 'accepted', placedAt: '12:25 PM', eta: '30 min',
+    source: 'website', status: 'accepted', placedAt: '12:25 PM', placedAtDaysAgo: 0, eta: '30 min',
+    deliveryType: 'pickup', payment: { status: 'paid', method: 'Online' },
     items: [{ name: 'Dal Makhani', qty: 1, price: 240 }, { name: 'Butter Naan', qty: 3, price: 55 }],
     total: 405, notes: ''
   },
   {
     id: mkId(), customer: 'Priya Nair', phone: '+91 94444 33221', area: 'Jayanagar 4th Block',
-    source: 'whatsapp', status: 'preparing', placedAt: '12:10 PM', eta: '10 min',
+    source: 'whatsapp', status: 'preparing', placedAt: '12:10 PM', placedAtDaysAgo: 1, eta: '10 min',
+    deliveryType: 'delivery', payment: { status: 'paid', method: 'UPI' },
     items: [{ name: 'Veg Thali', qty: 2, price: 260 }],
     total: 520, notes: 'Extra pickle'
   },
   {
     id: mkId(), customer: 'Arjun Mehta', phone: '+91 98001 12233', area: 'BTM Layout',
-    source: 'website', status: 'preparing', placedAt: '12:05 PM', eta: '12 min',
+    source: 'website', status: 'preparing', placedAt: '12:05 PM', placedAtDaysAgo: 1, eta: '12 min',
+    deliveryType: 'delivery', payment: { status: 'pending', method: 'Cash' },
     items: [{ name: 'Chicken Biryani', qty: 1, price: 320 }, { name: 'Gulab Jamun (2pc)', qty: 1, price: 90 }],
     total: 410, notes: ''
   },
   {
     id: mkId(), customer: 'Sneha Kulkarni', phone: '+91 97554 88221', area: 'Hebbal',
-    source: 'instagram', status: 'ready', placedAt: '11:55 AM', eta: 'Now',
+    source: 'instagram', status: 'ready', placedAt: '11:55 AM', placedAtDaysAgo: 2, eta: 'Now',
+    deliveryType: 'delivery', payment: { status: 'paid', method: 'UPI' },
     items: [{ name: 'Paneer Butter Masala', qty: 1, price: 290 }, { name: 'Butter Naan', qty: 2, price: 55 }],
     total: 400, notes: 'Ring bell twice'
   },
   {
     id: mkId(), customer: 'Ishaan Kapoor', phone: '+91 99112 33445', area: 'MG Road',
-    source: 'repeat', status: 'out', placedAt: '11:40 AM', eta: '5 min', rider: 'Suresh K.',
+    source: 'repeat', status: 'out', placedAt: '11:40 AM', placedAtDaysAgo: 2, eta: '5 min', rider: 'Suresh K.',
+    deliveryType: 'delivery', payment: { status: 'paid', method: 'Online' },
     items: [{ name: 'Chicken Biryani', qty: 1, price: 320 }],
     total: 320, notes: ''
   },
   {
     id: mkId(), customer: 'Meera Joshi', phone: '+91 93321 77889', area: 'Electronic City',
-    source: 'website', status: 'out', placedAt: '11:35 AM', eta: '12 min', rider: 'Manoj P.',
+    source: 'website', status: 'out', placedAt: '11:35 AM', placedAtDaysAgo: 3, eta: '12 min', rider: 'Manoj P.',
+    deliveryType: 'delivery', payment: { status: 'pending', method: 'Cash' },
     items: [{ name: 'Veg Thali', qty: 1, price: 260 }, { name: 'Masala Chai', qty: 2, price: 40 }],
     total: 340, notes: ''
   },
   {
     id: mkId(), customer: 'Aditya Singh', phone: '+91 98881 55667', area: 'Yelahanka',
-    source: 'whatsapp', status: 'delivered', placedAt: '11:10 AM', eta: '—', rider: 'Suresh K.',
+    source: 'whatsapp', status: 'delivered', placedAt: '11:10 AM', placedAtDaysAgo: 4, eta: '—', rider: 'Suresh K.',
+    deliveryType: 'delivery', payment: { status: 'paid', method: 'UPI' },
     items: [{ name: 'Butter Chicken', qty: 1, price: 340 }, { name: 'Jeera Rice', qty: 1, price: 180 }],
     total: 520, notes: 'Tipped ₹30'
   },
   {
     id: mkId(), customer: 'Neha Bhatt', phone: '+91 90001 22334', area: 'Malleshwaram',
-    source: 'repeat', status: 'delivered', placedAt: '11:00 AM', eta: '—', rider: 'Manoj P.',
+    source: 'repeat', status: 'delivered', placedAt: '11:00 AM', placedAtDaysAgo: 5, eta: '—', rider: 'Manoj P.',
+    deliveryType: 'pickup', payment: { status: 'paid', method: 'Online' },
     items: [{ name: 'Paneer Tikka Masala', qty: 1, price: 310 }, { name: 'Garlic Naan', qty: 2, price: 60 }],
     total: 430, notes: ''
   },
   {
     id: mkId(), customer: 'Rahul Pillai', phone: '+91 90876 54321', area: 'Banashankari',
-    source: 'instagram', status: 'cancelled', placedAt: '10:40 AM', eta: '—',
+    source: 'instagram', status: 'cancelled', placedAt: '10:40 AM', placedAtDaysAgo: 6, eta: '—',
+    deliveryType: 'delivery', payment: { status: 'pending', method: 'Cash' },
     items: [{ name: 'Chicken Biryani', qty: 1, price: 320 }],
     total: 320, notes: 'Customer cancelled — duplicate order'
   },
