@@ -9,6 +9,7 @@ import Topbar from '../components/Topbar.jsx'
 import StatCard from '../components/StatCard.jsx'
 import Badge from '../components/Badge.jsx'
 import OrderCard from '../components/OrderCard.jsx'
+import ChulhaAI from '../components/ChulhaAI.jsx'
 import { ORDER_STATUSES } from '../data/orders.js'
 import { TOP_DISHES, SOURCE_MIX, ALERTS, DAILY_ORDERS_TREND } from '../data/analytics.js'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -47,6 +48,9 @@ export default function Dashboard() {
           <StatCard label="Avg. ticket size" value={`₹${avgTicket}`}              delta="+4%"  trend="up"   icon={TrendingUp}   accent="indigo" />
           <StatCard label="Avg. prep time"   value="22 min"                       delta="-3 min" trend="up" icon={Clock}        accent="rose" />
         </div>
+
+        {/* Chulha AI — live briefing + chat */}
+        <ChulhaAI />
 
         {/* Charts row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
