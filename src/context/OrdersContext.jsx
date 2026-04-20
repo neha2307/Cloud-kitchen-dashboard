@@ -28,6 +28,7 @@ export function OrdersProvider({ children }) {
       id: `ORD-${nextId}`,
       status: 'new',
       placedAt: new Date().toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }),
+      placedAtDaysAgo: 0,
       eta: partial.scheduledFor ? partial.scheduledFor : '25 min',
       ...partial,
     }

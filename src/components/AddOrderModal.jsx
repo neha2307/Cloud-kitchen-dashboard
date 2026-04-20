@@ -237,6 +237,7 @@ export default function AddOrderModal() {
       address:  form.address.trim() || null,
       scheduledFor: form.schedule === 'later' ? form.scheduledTime : null,
       payment:  { ...form.payment },
+      deliveryType: form.deliveryType,
     })
 
     showToast({

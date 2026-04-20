@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react'
-import { Plus, Filter, Search, LayoutGrid, List as ListIcon } from 'lucide-react'
+import { Plus, Filter, Search, LayoutGrid, List as ListIcon, SearchX } from 'lucide-react'
 import Topbar from '../components/Topbar.jsx'
 import OrderCard from '../components/OrderCard.jsx'
 import Badge from '../components/Badge.jsx'
-import { ORDER_STATUSES } from '../data/orders.js'
+import EmptyState from '../components/EmptyState.jsx'
+import FilterPanel, { EMPTY_FILTERS, countActive } from '../components/FilterPanel.jsx'
+import FilterChips from '../components/FilterChips.jsx'
+import { ORDER_STATUSES, DATE_RANGES } from '../data/orders.js'
 import { useOrders } from '../context/OrdersContext.jsx'
 import { useUI } from '../context/UIContext.jsx'
 
@@ -15,24 +18,60 @@ const NEXT_LABELS = {
   out:       'Delivered',
 }
 
+function matchesFilters(order, filters) {
+  if (filters.statuses.length && !filters.statuses.includes(order.status)) return false
+  if (filters.sources.length  && !filters.sources.includes(order.source))  return false
+
+  if (filters.payment !== 'any') {
+    if (order.payment?.status !== filters.payment) return false
+  }
+  if (filters.delivery !== 'any') {
+    if (order.deliveryType !== filters.delivery) return false
+  }
+
+  const min = filters.amountMin === '' ? null : Number(filters.amountMin)
+  const max = filters.amountMax === '' ? null : Number(filters.amountMax)
+  if (min !== null && order.total < min) return false
+  if (max !== null && order.total > max) return false
+
+  if (filters.date !== 'any') {
+    const range = DATE_RANGES.find(r => r.key === filters.date)
+    if (range && (order.placedAtDaysAgo ?? 0) > range.maxDays) return false
+  }
+  return true
+}
+
 export default function Orders() {
   const { orders, advanceOrder } = useOrders()
   const { openNewOrder } = useUI()
   const [query, setQuery] = useState('')
   const [view, setView] = useState('board') // board | list
-  const [sourceFilter, setSourceFilter] = useState('all')
+  const [filters, setFilters] = useState(EMPTY_FILTERS)
+  const [filterOpen, setFilterOpen] = useState(false)
+
+  const activeCount = countActive(filters)
 
   const filtered = useMemo(() => {
-    return orders.filter(o =>
-      (sourceFilter === 'all' || o.source === sourceFilter) &&
-      (query === '' ||
-        o.id.toLowerCase().includes(query.toLowerCase()) ||
-        o.customer.toLowerCase().includes(query.toLowerCase()) ||
-        o.area.toLowerCase().includes(query.toLowerCase()))
-    )
-  }, [orders, query, sourceFilter])
+    const q = query.trim().toLowerCase()
+    return orders.filter(o => {
+      if (q !== '' &&
+        !o.id.toLowerCase().includes(q) &&
+        !o.customer.toLowerCase().includes(q) &&
+        !o.area.toLowerCase().includes(q)
+      ) return false
+      return matchesFilters(o, filters)
+    })
+  }, [orders, query, filters])
 
   const byStatus = (key) => filtered.filter(o => o.status === key)
+  const hasAnyConstraint = activeCount > 0 || query.trim() !== ''
+
+  // Keep the segmented Source control in sync with the Source filter.
+  // 'all' here maps to "no source filter applied".
+  const sourceSegment = filters.sources.length === 1 ? filters.sources[0] : 'all'
+  const setSourceSegment = (key) => {
+    setFilters(f => ({ ...f, sources: key === 'all' ? [] : [key] }))
+  }
 
   return (
     <>
@@ -50,7 +89,7 @@ export default function Orders() {
             />
           </div>
 
-          <div className="flex items-center gap-1 bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700 rounded-xl p-1">
+          <div className="hidden md:flex items-center gap-1 bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700 rounded-xl p-1">
             {[
               { k: 'all',       l: 'All' },
               { k: 'whatsapp',  l: 'WhatsApp' },
@@ -60,8 +99,8 @@ export default function Orders() {
             ].map(s => (
               <button
                 key={s.k}
-                onClick={() => setSourceFilter(s.k)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg ${sourceFilter === s.k ? 'bg-saffron-500 text-white' : 'text-ink-500 dark:text-ink-200 hover:bg-ink-100 dark:hover:bg-ink-700'}`}
+                onClick={() => setSourceSegment(s.k)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg ${sourceSegment === s.k ? 'bg-saffron-500 text-white' : 'text-ink-500 dark:text-ink-200 hover:bg-ink-100 dark:hover:bg-ink-700'}`}
               >
                 {s.l}
               </button>
@@ -72,11 +111,55 @@ export default function Orders() {
             <button onClick={() => setView('board')} className={`p-1.5 rounded-lg ${view==='board'?'bg-ink-100 dark:bg-ink-700':''}`}><LayoutGrid className="h-4 w-4" /></button>
             <button onClick={() => setView('list')} className={`p-1.5 rounded-lg ${view==='list'?'bg-ink-100 dark:bg-ink-700':''}`}><ListIcon className="h-4 w-4" /></button>
           </div>
-          <button className="btn-secondary !py-2"><Filter className="h-4 w-4" />Filter</button>
+
+          <div className="relative">
+            <button
+              data-filter-trigger
+              onClick={() => setFilterOpen(v => !v)}
+              className={`btn-secondary !py-2 ${activeCount > 0 ? '!border-saffron-500 !text-saffron-700 dark:!text-saffron-300' : ''}`}
+              aria-expanded={filterOpen}
+              aria-haspopup="dialog"
+            >
+              <Filter className="h-4 w-4" />
+              Filter
+              {activeCount > 0 && (
+                <span className="ml-1 inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full bg-saffron-500 text-white text-[11px] font-bold tabular-nums">
+                  {activeCount}
+                </span>
+              )}
+            </button>
+            <FilterPanel
+              open={filterOpen}
+              onClose={() => setFilterOpen(false)}
+              filters={filters}
+              setFilters={setFilters}
+              activeCount={activeCount}
+            />
+          </div>
+
           <button onClick={openNewOrder} className="btn-primary !py-2"><Plus className="h-4 w-4" />New order</button>
         </div>
 
-        {view === 'board' ? (
+        {/* Active filter chips */}
+        <FilterChips filters={filters} setFilters={setFilters} />
+
+        {filtered.length === 0 ? (
+          <EmptyState
+            icon={SearchX}
+            title="No orders match your filters"
+            description={hasAnyConstraint
+              ? 'Try removing a filter or clearing your search.'
+              : 'You don’t have any orders yet.'}
+            action={hasAnyConstraint ? (
+              <button
+                className="btn-secondary"
+                onClick={() => { setFilters(EMPTY_FILTERS); setQuery('') }}
+              >
+                Clear all filters
+              </button>
+            ) : null}
+          />
+        ) : view === 'board' ? (
           <div className="flex gap-4 overflow-x-auto pb-4 kanban-scroll">
             {ORDER_STATUSES.map(status => {
               const list = byStatus(status.key)
