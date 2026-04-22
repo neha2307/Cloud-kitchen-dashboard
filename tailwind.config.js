@@ -37,6 +37,29 @@ export default {
           800: '#822A16',
           900: '#5E2014',
         },
+        // Customer-side: veg indicator (Indian convention — green square)
+        leaf: {
+          50:  '#EEF8EF',
+          100: '#D5EED8',
+          500: '#2E7D32',
+          600: '#256A29',
+          700: '#1C5521',
+        },
+        // Customer-side: non-veg indicator (brown-red square)
+        chili: {
+          50:  '#FBEDED',
+          100: '#F4CFCF',
+          500: '#B71C1C',
+          600: '#991515',
+        },
+        // Customer-side: bestseller / honey amber
+        honey: {
+          50:  '#FFF7E6',
+          100: '#FDEAC2',
+          400: '#F59E0B',
+          500: '#D97706',
+          600: '#B25904',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
